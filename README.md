@@ -1,69 +1,84 @@
-# Packer Plugin Scaffolding
+# Packer Plugin for HCI 
 
-This repository is a template for a Packer multi-component plugin. It is intended as a starting point for creating Packer plugins, containing:
-- A builder ([builder/scaffolding](builder/scaffolding))
-- A provisioner ([provisioner/scaffolding](provisioner/scaffolding))
-- A post-processor ([post-processor/scaffolding](post-processor/scaffolding))
-- A data source ([datasource/scaffolding](datasource/scaffolding))
-- Docs ([docs](docs))
-- A working example ([example](example))
+This is a [HashiCorp Packer](https://www.packer.io/) plugin for creating  image in a private cloud.
 
-These folders contain boilerplate code that you will need to edit to create your own Packer multi-component plugin.
-A full guide to creating Packer plugins can be found at [Extending Packer](https://www.packer.io/docs/plugins/creation).
+I wrote this plugin for learning.
 
-In this repository you will also find a pre-defined GitHub Action configuration for the release workflow
-(`.goreleaser.yml` and `.github/workflows/release.yml`). The release workflow configuration makes sure the GitHub
-release artifacts are created with the correct binaries and naming conventions.
+## Installation
 
-Please see the [GitHub template repository documentation](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/creating-a-repository-from-a-template)
-for how to create a new repository from this template on GitHub.
+### Using pre-built releases
 
-## Packer plugin projects
+#### Using the `packer init` command
 
-Here's a non exaustive list of Packer plugins that you can checkout:
+Starting from version 1.7, Packer supports a new `packer init` command allowing
+automatic installation of Packer plugins. Read the
+[Packer documentation](https://www.packer.io/docs/commands/init) for more information.
 
-* [github.com/hashicorp/packer-plugin-docker](https://github.com/hashicorp/packer-plugin-docker)
-* [github.com/exoscale/packer-plugin-exoscale](https://github.com/exoscale/packer-plugin-exoscale)
-* [github.com/sylviamoss/packer-plugin-comment](https://github.com/sylviamoss/packer-plugin-comment)
-* [github.com/hashicorp/packer-plugin-hashicups](https://github.com/hashicorp/packer-plugin-hashicups)
+To install this plugin, copy and paste this code into your Packer configuration .
+Then, run [`packer init`](https://www.packer.io/docs/commands/init).
 
-Looking at their code will give you good examples.
-
-## Running Acceptance Tests
-
-Make sure to install the plugin with `go build .` and to have Packer installed locally.
-Then source the built binary to the plugin path with `cp packer-plugin-scaffolding ~/.packer.d/plugins/packer-plugin-scaffolding`
-Once everything needed is set up, run:
-```
-PACKER_ACC=1 go test -count 1 -v ./... -timeout=120m
+```hcl
+packer {
+  required_plugins {
+    hci = {
+      version = ">= 0.0.1"
+      source  = "github.com/wangweihong/hci"
+    }
+  }
+}
 ```
 
-This will run the acceptance tests for all plugins in this set.
+### Install from source
 
-## Test Plugin Example Action
+If you prefer to build the plugin from source, clone the GitHub repository
+to `$GOPATH/src/github.com/wangweihong/packer-plugin-hci`.
 
-This scaffolding configures a [manually triggered plugin test action](/.github/workflows/test-plugin-example.yml).
-By default, the action will run Packer at the latest version to init, validate, and build the example configuration
-within the [example](example) folder. This is useful to quickly test a basic template of your plugin against Packer.
+```sh
+mkdir -p $GOPATH/src/github.com/wangweihong; cd $GOPATH/src/github.com/wangwiehong
+git clone git@github.com:wangweihong/packer-plugin-hci.git
+```
 
-The example must contain the `required_plugins` block and require your plugin at the latest or any other released version.
-This will help test and validate plugin releases.
+Then enter the plugin directory and run `make dev` command to build the plugin.
 
-## Registering Plugin as Packer Integration
+```sh
+cd $GOPATH/src/github.com/wangweihong/packer-plugin-hci
+make dev
+```
 
-Partner and community plugins can be hard to find if a user doesn't know what 
-they are looking for. To assist with plugin discovery Packer offers an integration
-portal at https://developer.hashicorp.com/packer/integrations to list known integrations 
-that work with the latest release of Packer. 
+Upon successful compilation, a `packer-plugin-hci` plugin binary file
+can be found in the directory. To install the compiled plugin, please follow the
+official Packer documentation on [installing a plugin](https://www.packer.io/docs/extending/plugins/#installing-plugins).
 
-Registering a plugin as an integration requires [metadata configuration](./metadata.hcl) within the plugin
-repository and approval by the Packer team. To initiate the process of registering your 
-plugin as a Packer integration refer to the [Developing Plugins](https://developer.hashicorp.com/packer/docs/plugins/creation#registering-plugins) page.
+## Configuration
 
-# Requirements
+For more information on how to configure the plugin, please read the
+documentation located in the [`docs/`](docs) directory or [`wiki`](https://github.com/huaweicloud/packer-plugin-huaweicloud/wiki).
 
--	[packer-plugin-sdk](https://github.com/hashicorp/packer-plugin-sdk) >= v0.2.9
--	[Go](https://golang.org/doc/install) >= 1.20
+## [Logging and Debugging](https://developer.hashicorp.com/packer/docs/debugging)
 
-## Packer Compatibility
-This scaffolding template is compatible with Packer >= v1.7.0
+### Debugging Packer in Linux
+
+```shell
+$ export HTTPCLI_DEBUG=1
+$ export PACKER_LOG=1
+$ export PACKER_LOG_PATH="./packer.log"
+```
+
+### Debugging Packer in Powershell/Windows
+
+```powershell
+$env:HW_DEBUG=1
+$env:PACKER_LOG=1
+$env:PACKER_LOG_PATH="./packer.log"
+```
+
+## Contributing
+
+* If you think you've found a bug in the code or you have a question regarding
+  the usage of this software, please reach out to us by opening an issue in
+  this GitHub repository.
+* Contributions to this project are welcome: if you want to add a feature or a
+  fix a bug, please do so by opening a Pull Request in this GitHub repository.
+  In case of feature contribution, we kindly ask you to open an issue to
+  discuss it beforehand.
+  
