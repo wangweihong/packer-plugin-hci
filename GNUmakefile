@@ -1,4 +1,4 @@
-NAME=scaffolding
+NAME=hci
 BINARY=packer-plugin-${NAME}
 
 COUNT?=1
@@ -26,7 +26,8 @@ plugin-check: install-packer-sdc build
 testacc: dev
 	@PACKER_ACC=1 go test -count $(COUNT) -v $(TEST) -timeout=120m
 
-generate: install-packer-sdc
+#generate: install-packer-sdc
+generate:
 	@go generate ./...
 	@rm -rf .docs
 	@packer-sdc renderdocs -src docs -partials docs-partials/ -dst .docs/

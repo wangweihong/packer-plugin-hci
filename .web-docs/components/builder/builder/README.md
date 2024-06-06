@@ -46,3 +46,5 @@ a consistent plugin structure.
    sources = ["source.scaffolding.example"]
  }
 ```
+
+

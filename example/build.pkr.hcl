@@ -1,43 +1,65 @@
-# Copyright (c) HashiCorp, Inc.
-# SPDX-License-Identifier: MPL-2.0
 
-packer {
-  required_plugins {
-    scaffolding = {
-      version = ">=v0.1.0"
-      source  = "github.com/hashicorp/scaffolding"
-    }
-  }
+
+source "hci-iso" "example" {
+  endpoint    = var.endpoint
+  tenant     = var.tenant
+  user       = var.user
+  password   = var.password
+  image_name = var.image_name
+  boot_command = local.boot_command
+  boot_wait     = local.boot_wait
+  communicator     = local.communicator
+  ssh_username       = var.ssh_username
+  ssh_password       = var.ssh_password
+  ssh_port         = var.ssh_port
+  ssh_timeout      = var.ssh_timeout
+
+  http_directory   = local.http_directory
+  target_tenant = var.target_tenant
+  specification = var.specification
+  repository_name  =  var.repository_name
+  iso_name = var.iso_name
+  disk_size = var.disk_size
+  instance_cidr = var.instance_cidr
 }
 
-source "scaffolding-my-builder" "foo-example" {
-  mock = local.foo
-}
+source "hci-vmx" "example" {
+  endpoint    = var.endpoint
+  tenant     = var.tenant
+  user       = var.user
+  password   = var.password
+  image_name = var.image_name
+  boot_command = local.boot_command
+  boot_wait     = local.boot_wait
+  communicator     = local.communicator
+  ssh_username       = var.ssh_username
+  ssh_password       = var.ssh_password
+  ssh_port         = var.ssh_port
+  ssh_timeout      = var.ssh_timeout
 
-source "scaffolding-my-builder" "bar-example" {
-  mock = local.bar
+  http_directory   = local.http_directory
+  target_tenant = var.target_tenant
+  specification = var.specification
+  repository_name  =  var.repository_name
+  source_image = var.source_image
+  disk_size = var.disk_size
+  instance_cidr = var.instance_cidr
 }
 
 build {
   sources = [
-    "source.scaffolding-my-builder.foo-example",
+    //"source.hci-iso.example",
+    "source.hci-vmx.example",
+
   ]
 
-  source "source.scaffolding-my-builder.bar-example" {
-    name = "bar"
+  provisioner "shell" {
+    inline = local.inline_custom_image_scripts
+    execute_command= "echo 'vagrant' | {{ .Vars }} sudo -S -E bash -eux '{{ .Path }}'"
   }
 
-  provisioner "scaffolding-my-provisioner" {
-    only = ["scaffolding-my-builder.foo-example"]
-    mock = "foo: ${local.foo}"
-  }
-
-  provisioner "scaffolding-my-provisioner" {
-    only = ["scaffolding-my-builder.bar"]
-    mock = "bar: ${local.bar}"
-  }
-
-  post-processor "scaffolding-my-post-processor" {
-    mock = "post-processor mock-config"
-  }
+  #post-processor "manifest" {
+  # strip_path = true
+  # output     = "packer-manifest.json"
+  #}
 }
